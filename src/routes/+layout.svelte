@@ -5,6 +5,9 @@
   import { settings, loadSettings, themeClass, updateSettings } from '@/lib/stores';
   import { requestPersistentStorage } from '@/lib/storage';
   import { installGlobalHandler } from '@/lib/errorLog';
+  
+  // Beautiful Lucide icons
+  import { Calendar, Image, Search, Settings, Sun, Moon, Sparkles } from 'lucide-svelte';
 
   onMount(() => {
     loadSettings();
@@ -16,7 +19,7 @@
   });
 
   afterNavigate(() => {
-    // Gentle page transition when supported
+    // Smooth page transition when supported
     if ((document as any).startViewTransition) {
       (document as any).startViewTransition(() => {});
     }
@@ -24,6 +27,7 @@
 
   $: theme = $themeClass;
   $: tfClass = $settings?.typeface === 'pairB' ? 'tf-b' : 'tf-a';
+  $: isDark = theme === 'dark';
 
   function toggleTheme() {
     const next = ($settings?.theme ?? 'system') === 'midnight' ? 'daylight' : 'midnight';
@@ -35,29 +39,75 @@
   <title>Tiny Gratitude</title>
 </svelte:head>
 
-<div class:dark={theme === 'dark'} class={"min-h-full " + tfClass}>
-  <header class="sticky top-0 z-10 backdrop-blur bg-[color:var(--bg)]/75 border-b border-black/5 dark:border-white/5">
-    <nav class="mx-auto max-w-screen-sm px-4 h-14 flex items-center justify-between">
-      <a href="/" class="font-semibold tracking-tight">Grats</a>
-      <div class="flex items-center gap-3 text-sm" role="toolbar" aria-label="Primary">
-        <a href="/calendar" aria-label="Calendar" class="opacity-80 hover:opacity-100" title="Calendar">📅</a>
-        <a href="/gallery" aria-label="Gallery" class="opacity-80 hover:opacity-100" title="Gallery">🖼️</a>
-        <a href="/search" aria-label="Search" class="opacity-80 hover:opacity-100" title="Search">🔎</a>
-        <a href="/settings" aria-label="Settings" class="opacity-80 hover:opacity-100" title="Settings">⚙️</a>
-        <button class="ml-2 rounded px-2 py-1 border border-black/10 dark:border-white/10" on:click={toggleTheme} aria-label="Toggle theme">🌓</button>
+<div class:dark={theme === 'dark'} class:mocha={isDark} class:latte={!isDark} class={"min-h-full " + tfClass}>
+  <!-- Beautiful glassmorphism header -->
+  <header class="sticky top-0 z-50 glass-subtle bg-ctp-base/80 border-b border-ctp-surface0/50">
+    <nav class="mx-auto max-w-screen-sm px-6 h-16 flex items-center justify-between">
+      <!-- Logo with sparkle icon -->
+      <a href="/" class="flex items-center gap-2 font-bold text-lg text-ctp-mauve hover:text-ctp-pink transition-colors duration-200">
+        <Sparkles size={20} class="text-ctp-yellow" />
+        <span class="font-serif">Gratitude</span>
+      </a>
+      
+      <!-- Navigation icons -->
+      <div class="flex items-center gap-1" role="toolbar" aria-label="Primary navigation">
+        <a 
+          href="/calendar" 
+          aria-label="Calendar" 
+          class="p-2.5 rounded-xl text-ctp-subtext1 hover:text-ctp-mauve hover:bg-ctp-surface0/50 transition-all duration-200 btn-animate focus-ring" 
+          title="Calendar"
+        >
+          <Calendar size={18} />
+        </a>
+        <a 
+          href="/gallery" 
+          aria-label="Gallery" 
+          class="p-2.5 rounded-xl text-ctp-subtext1 hover:text-ctp-sapphire hover:bg-ctp-surface0/50 transition-all duration-200 btn-animate focus-ring" 
+          title="Gallery"
+        >
+          <Image size={18} />
+        </a>
+        <a 
+          href="/search" 
+          aria-label="Search" 
+          class="p-2.5 rounded-xl text-ctp-subtext1 hover:text-ctp-green hover:bg-ctp-surface0/50 transition-all duration-200 btn-animate focus-ring" 
+          title="Search"
+        >
+          <Search size={18} />
+        </a>
+        <a 
+          href="/settings" 
+          aria-label="Settings" 
+          class="p-2.5 rounded-xl text-ctp-subtext1 hover:text-ctp-peach hover:bg-ctp-surface0/50 transition-all duration-200 btn-animate focus-ring" 
+          title="Settings"
+        >
+          <Settings size={18} />
+        </a>
+        
+        <!-- Beautiful theme toggle -->
+        <div class="ml-2 w-px h-6 bg-ctp-surface1"></div>
+        <button 
+          class="ml-2 p-2.5 rounded-xl bg-ctp-surface0/70 text-ctp-subtext1 hover:text-ctp-yellow hover:bg-ctp-surface1 transition-all duration-200 btn-animate focus-ring" 
+          on:click={toggleTheme} 
+          aria-label="Toggle theme"
+        >
+          {#if isDark}
+            <Moon size={18} />
+          {:else}
+            <Sun size={18} />
+          {/if}
+        </button>
       </div>
     </nav>
   </header>
 
-  <main class="mx-auto max-w-screen-sm px-4 py-6">
+  <!-- Main content with beautiful spacing -->
+  <main class="mx-auto max-w-screen-sm px-6 py-8">
     <slot />
   </main>
 </div>
 
 <style>
-  header { -webkit-backdrop-filter: blur(8px); backdrop-filter: blur(8px); }
-  .dark header { background-color: rgba(15,17,21,0.75); }
   .tf-a { --font-serif: Georgia, Cambria, 'Times New Roman', Times, serif; --font-sans: Inter, system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif; }
   .tf-b { --font-serif: 'Iowan Old Style', 'Palatino', Georgia, serif; --font-sans: 'SF Pro Text', system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif; }
-  .tf-a body, .tf-b body { font-family: var(--font-sans); }
 </style>
