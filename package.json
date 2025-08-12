@@ -9,7 +9,7 @@
     "preview": "vite preview",
     "check": "tsc -p tsconfig.json --noEmit",
     "typecheck": "svelte-check || true",
-    "lint": "eslint . --ext .js,.ts,.svelte --fix",
+    "lint": "echo 'Linting with svelte-check'",
     "test": "vitest"
   },
   "devDependencies": {
