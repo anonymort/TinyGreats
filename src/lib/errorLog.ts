@@ -1,11 +1,16 @@
+import { browser } from '$app/environment';
+
 export type ErrorEntry = { t: number; m: string; s?: string };
 
 const KEY = 'tg_error_log_v1';
 
 function load(): ErrorEntry[] {
+  if (!browser) return [];
   try { return JSON.parse(localStorage.getItem(KEY) || '[]'); } catch { return []; }
 }
+
 function save(arr: ErrorEntry[]) {
+  if (!browser) return;
   try { localStorage.setItem(KEY, JSON.stringify(arr.slice(-200))); } catch {}
 }
 
@@ -20,7 +25,8 @@ export function getErrors() { return [...log]; }
 export function clearErrors() { log = []; save(log); }
 
 export function installGlobalHandler() {
-  window.addEventListener('error', (e) => addError(e.message, e.error?.stack));
-  window.addEventListener('unhandledrejection', (e) => addError(String(e.reason)));
+  if (!browser) return;
+  window.addEventListener('error', (e: ErrorEvent) => addError(e.message, e.error?.stack));
+  window.addEventListener('unhandledrejection', (e: PromiseRejectionEvent) => addError(String(e.reason)));
 }
 

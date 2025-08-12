@@ -2,7 +2,7 @@ import { animate } from 'motion';
 
 export function focusBloom(node: HTMLElement) {
   function onFocus() {
-    animate(node, { scale: [1, 1.02, 1] }, { duration: 0.18, easing: 'ease-out' });
+    animate(node, { scale: [1, 1.02, 1] }, { duration: 180, easing: [0.4, 0, 0.2, 1] });
   }
   node.addEventListener('focus', onFocus, true);
   return {
@@ -14,7 +14,7 @@ export function focusBloom(node: HTMLElement) {
 
 export function clickPulse(node: HTMLElement) {
   function onClick() {
-    animate(node, { scale: [1, 0.96, 1] }, { duration: 0.14, easing: 'ease-out' });
+    animate(node, { scale: [1, 0.96, 1] }, { duration: 140, easing: [0.4, 0, 0.2, 1] });
   }
   node.addEventListener('click', onClick);
   return {

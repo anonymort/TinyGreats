@@ -39,7 +39,7 @@
   <title>Tiny Gratitude</title>
 </svelte:head>
 
-<div class:dark={theme === 'dark'} class:mocha={isDark} class:latte={!isDark} class={"min-h-full " + tfClass}>
+<div class="{theme} min-h-full {tfClass}" class:mocha={isDark} class:latte={!isDark}>
   <!-- Beautiful glassmorphism header -->
   <header class="sticky top-0 z-50 glass-subtle bg-ctp-base/80 border-b border-ctp-surface0/50">
     <nav class="mx-auto max-w-screen-sm px-6 h-16 flex items-center justify-between">
@@ -84,18 +84,22 @@
           <Settings size={18} />
         </a>
         
-        <!-- Beautiful theme toggle -->
+        <!-- Beautiful theme toggle with smooth transitions -->
         <div class="ml-2 w-px h-6 bg-ctp-surface1"></div>
         <button 
-          class="ml-2 p-2.5 rounded-xl bg-ctp-surface0/70 text-ctp-subtext1 hover:text-ctp-yellow hover:bg-ctp-surface1 transition-all duration-200 btn-animate focus-ring" 
+          class="group ml-2 p-2.5 rounded-xl bg-ctp-surface0/70 text-ctp-subtext1 hover:text-ctp-yellow hover:bg-ctp-surface1 transition-all duration-300 btn-animate focus-ring" 
           on:click={toggleTheme} 
-          aria-label="Toggle theme"
+          aria-label={isDark ? 'Switch to light mode' : 'Switch to dark mode'}
+          title={isDark ? 'Switch to light mode' : 'Switch to dark mode'}
         >
-          {#if isDark}
-            <Moon size={18} />
-          {:else}
-            <Sun size={18} />
-          {/if}
+          <div class="relative w-[18px] h-[18px]">
+            <div class="absolute inset-0 transition-all duration-300 {isDark ? 'opacity-100 rotate-0 scale-100' : 'opacity-0 rotate-90 scale-75'}">
+              <Moon size={18} />
+            </div>
+            <div class="absolute inset-0 transition-all duration-300 {!isDark ? 'opacity-100 rotate-0 scale-100' : 'opacity-0 -rotate-90 scale-75'}">
+              <Sun size={18} />
+            </div>
+          </div>
         </button>
       </div>
     </nav>
@@ -108,6 +112,12 @@
 </div>
 
 <style>
-  .tf-a { --font-serif: Georgia, Cambria, 'Times New Roman', Times, serif; --font-sans: Inter, system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif; }
-  .tf-b { --font-serif: 'Iowan Old Style', 'Palatino', Georgia, serif; --font-sans: 'SF Pro Text', system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif; }
+  .tf-a { 
+    --font-serif: "Fraunces", Georgia, Cambria, "Times New Roman", Times, serif; 
+    --font-sans: "Inter", system-ui, -apple-system, "Segoe UI", Roboto, Arial, sans-serif; 
+  }
+  .tf-b { 
+    --font-serif: "Fraunces", "Iowan Old Style", "Palatino", Georgia, serif; 
+    --font-sans: "Inter", "SF Pro Text", system-ui, -apple-system, "Segoe UI", Roboto, Arial, sans-serif; 
+  }
 </style>

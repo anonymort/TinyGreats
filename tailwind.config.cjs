@@ -6,8 +6,8 @@ module.exports = {
   theme: {
     extend: {
       fontFamily: {
-        serif: ["var(--font-serif)"],
-        sans: ["var(--font-sans)"]
+        serif: ["var(--font-serif)", "Fraunces", "Georgia", "serif"],
+        sans: ["var(--font-sans)", "Inter", "system-ui", "-apple-system", "sans-serif"]
       },
       spacing: {
         0.5: '2px',
