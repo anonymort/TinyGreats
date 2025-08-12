@@ -1,0 +1,29 @@
+:8080 {
+    root * /usr/share/caddy
+    encode gzip
+    file_server
+
+    header {
+        # Secure CSP with SvelteKit inline script hash
+        Content-Security-Policy "
+          default-src 'self';
+          script-src 'self' 'sha256-EQjTVOq253TobG4qtbo4zZO1zEGi3wYH1Uzg8qhPj2k=';
+          style-src 'self' 'unsafe-inline';
+          img-src 'self' data: blob:;
+          font-src 'self' data:;
+          connect-src 'self';
+          manifest-src 'self';
+          worker-src 'self' blob:;
+          base-uri 'self';
+          frame-ancestors 'none';
+          form-action 'self'
+        "
+        Referrer-Policy "no-referrer"
+        X-Content-Type-Options "nosniff"
+        X-Frame-Options "DENY"
+        Permissions-Policy "camera=(), microphone=(), geolocation=()"
+    }
+
+    # SPA fallback - serve index.html for any path not found
+    try_files {path} {path}/ /index.html
+}

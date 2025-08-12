@@ -5,8 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <meta name="theme-color" content="#0f1115" />
 
-    <!-- Offline-only CSP: blocks all network egress -->
-    <meta http-equiv="Content-Security-Policy" content="default-src 'self'; connect-src 'none'; img-src 'self' data:; media-src 'self' blob:; frame-ancestors 'none'; style-src 'self' 'unsafe-inline'; script-src 'self';" />
+    <!-- CSP moved to Caddy headers for proper frame-ancestors support -->
 
     <link rel="manifest" href="/manifest.webmanifest" />
     %sveltekit.head%
