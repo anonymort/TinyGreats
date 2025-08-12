@@ -7,13 +7,11 @@ const config = {
       pages: 'build',
       assets: 'build',
       fallback: 'index.html'
-      // strict stays default (true); fallback satisfies it
     }),
     alias: {
       '@': 'src',
       '$lib': 'src/lib'
     }
-    // No global prerender entries — SPA fallback handles routes
   }
 };
 
