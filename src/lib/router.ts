@@ -15,7 +15,14 @@ export class Router {
   constructor() {
     // Listen for hash changes
     window.addEventListener('hashchange', () => this.handleRouteChange());
-    window.addEventListener('load', () => this.handleRouteChange());
+  }
+
+  /**
+   * Start the router and handle initial route
+   * Call this after all routes have been registered
+   */
+  start(): void {
+    this.handleRouteChange();
   }
 
   /**
