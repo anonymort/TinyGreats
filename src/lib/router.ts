@@ -5,9 +5,12 @@ export type Route = {
   params: Record<string, string>;
 };
 
+type RouteHandler = (params: Record<string, string>) => () => void | void;
+
 export class Router {
   private currentRoute = new Store<Route>({ path: '/', params: {} });
-  private routes: Map<string, (params: Record<string, string>) => void> = new Map();
+  private routes: Map<string, RouteHandler> = new Map();
+  private cleanup: (() => void) | null = null;
 
   constructor() {
     // Listen for hash changes
@@ -20,7 +23,7 @@ export class Router {
    * @param pattern Route pattern like "/", "/calendar", "/day/:ymd"
    * @param handler Function to call when route matches
    */
-  on(pattern: string, handler: (params: Record<string, string>) => void): void {
+  on(pattern: string, handler: RouteHandler): void {
     this.routes.set(pattern, handler);
   }
 
@@ -44,11 +47,24 @@ export class Router {
 
     this.currentRoute.set({ path, params });
 
+    // Run previous cleanup (if any)
+    if (this.cleanup) {
+      try {
+        this.cleanup();
+      } catch (error) {
+        console.error('[Router] Cleanup error', error);
+      }
+      this.cleanup = null;
+    }
+
     // Find and execute matching handler
     for (const [pattern, handler] of this.routes) {
       if (this.isMatch(pattern, path)) {
         const routeParams = this.extractParams(pattern, path);
-        handler(routeParams);
+        const maybeCleanup = handler(routeParams);
+        if (typeof maybeCleanup === 'function') {
+          this.cleanup = maybeCleanup;
+        }
         return;
       }
     }
@@ -56,7 +72,10 @@ export class Router {
     // No match found - call 404 handler if registered
     const notFoundHandler = this.routes.get('*');
     if (notFoundHandler) {
-      notFoundHandler({});
+      const maybeCleanup = notFoundHandler({});
+      if (typeof maybeCleanup === 'function') {
+        this.cleanup = maybeCleanup;
+      }
     }
   }
 

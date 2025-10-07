@@ -3,7 +3,7 @@ import type { Great } from '@/lib/types';
 import { EmojiPicker } from '@/components/emoji-picker';
 import { addFocusBloom, addClickPulse } from '@/lib/animations';
 
-export function createDayPage(container: HTMLElement, ymd: string): void {
+export function createDayPage(container: HTMLElement, ymd: string): () => void {
   container.innerHTML = '';
 
   let entry = '';
@@ -11,23 +11,26 @@ export function createDayPage(container: HTMLElement, ymd: string): void {
   let saved: Great | null = null;
   let emojiPicker: EmojiPicker | null = null;
   let recent: string[] = [];
+  let disposed = false;
+  const cleanupFns: Array<() => void> = [];
 
-  // Load recent emojis
+  const registerCleanup = (fn: () => void) => cleanupFns.push(fn);
+  const runCleanups = () => {
+    while (cleanupFns.length) {
+      try {
+        cleanupFns.pop()?.();
+      } catch (error) {
+        console.error('[Day] Cleanup error', error);
+      }
+    }
+    emojiPicker = null;
+  };
+
   try {
     recent = JSON.parse(localStorage.getItem('recent_emojis') || '[]');
   } catch {
     recent = [];
   }
-
-  // Load existing entry
-  getGreatByYmd(ymd).then((g) => {
-    if (g) {
-      saved = g;
-      entry = g.entry;
-      mood = g.mood ?? '';
-    }
-    render();
-  });
 
   async function save() {
     const text = entry.trim();
@@ -44,6 +47,8 @@ export function createDayPage(container: HTMLElement, ymd: string): void {
     };
 
     await upsertGreat(g);
+    if (disposed) return;
+
     saved = g;
 
     if (mood) {
@@ -55,22 +60,23 @@ export function createDayPage(container: HTMLElement, ymd: string): void {
   }
 
   function render() {
+    if (disposed) return;
+    runCleanups();
     container.innerHTML = '';
 
     const section = document.createElement('section');
     section.className = 'mt-6 rounded-2xl border border-slate-200 bg-white p-5 shadow-sm';
 
-    // Title
     const title = document.createElement('h1');
     title.className = 'text-lg font-serif mb-4 text-slate-900';
     title.textContent = ymd;
     section.appendChild(title);
 
-    // Form
     const form = document.createElement('div');
     form.className = 'relative flex items-center gap-2';
 
-    // Input
+    let saveBtn: HTMLButtonElement;
+
     const input = document.createElement('input');
     input.id = 'day-input';
     input.type = 'text';
@@ -78,20 +84,21 @@ export function createDayPage(container: HTMLElement, ymd: string): void {
     input.value = entry;
     input.placeholder = 'Add a great for this day…';
     input.className = 'flex-1 rounded-lg border border-slate-300 bg-white px-3 py-2 text-slate-900 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-slate-400';
+
     input.addEventListener('input', (e) => {
       entry = (e.target as HTMLInputElement).value;
-      saveBtn.disabled = !entry.trim();
+      if (saveBtn) saveBtn.disabled = !entry.trim();
     });
 
-    const cleanup1 = addFocusBloom(input);
+    registerCleanup(addFocusBloom(input));
 
-    // Emoji button
     const emojiBtn = document.createElement('button');
     emojiBtn.className = 'w-10 h-10 rounded-lg border border-slate-300 bg-white hover:bg-slate-50 transition-colors';
     emojiBtn.textContent = mood || '😊';
     emojiBtn.setAttribute('aria-label', 'Pick emoji');
 
-    emojiPicker = new EmojiPicker({
+    emojiPicker?.destroy();
+    const picker = new EmojiPicker({
       anchor: emojiBtn,
       recent,
       onSelect: (emoji) => {
@@ -99,17 +106,16 @@ export function createDayPage(container: HTMLElement, ymd: string): void {
         emojiBtn.textContent = mood || '😊';
       }
     });
+    emojiPicker = picker;
+    emojiBtn.addEventListener('click', () => picker.toggle());
+    registerCleanup(() => picker.destroy());
 
-    emojiBtn.addEventListener('click', () => emojiPicker?.toggle());
-
-    // Save button
-    const saveBtn = document.createElement('button');
+    saveBtn = document.createElement('button');
     saveBtn.className = 'rounded-lg px-4 py-2 bg-slate-900 text-white hover:bg-slate-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed';
     saveBtn.textContent = 'Save';
     saveBtn.disabled = !entry.trim();
     saveBtn.addEventListener('click', save);
-
-    const cleanup2 = addClickPulse(saveBtn);
+    registerCleanup(addClickPulse(saveBtn));
 
     form.appendChild(input);
     form.appendChild(emojiBtn);
@@ -117,14 +123,22 @@ export function createDayPage(container: HTMLElement, ymd: string): void {
     section.appendChild(form);
 
     container.appendChild(section);
-
-    // Store cleanup functions
-    (section as any).__cleanup = () => {
-      cleanup1();
-      cleanup2();
-      emojiPicker?.destroy();
-    };
   }
 
   render();
+
+  getGreatByYmd(ymd).then((g) => {
+    if (disposed) return;
+    if (g) {
+      saved = g;
+      entry = g.entry;
+      mood = g.mood ?? '';
+      render();
+    }
+  });
+
+  return () => {
+    disposed = true;
+    runCleanups();
+  };
 }

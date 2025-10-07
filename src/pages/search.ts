@@ -1,7 +1,7 @@
 import { db } from '@/lib/db';
 import type { Great } from '@/lib/types';
 
-export function createSearchPage(container: HTMLElement): void {
+export function createSearchPage(container: HTMLElement): () => void {
   container.innerHTML = '';
 
   let q = '';
@@ -9,6 +9,7 @@ export function createSearchPage(container: HTMLElement): void {
   let start = '';
   let end = '';
   let results: Great[] = [];
+  let disposed = false;
 
   async function run() {
     const startY = start || '0000-01-01';
@@ -20,10 +21,12 @@ export function createSearchPage(container: HTMLElement): void {
 
     // Newest first
     results = coll.sort((a, b) => b.createdAt - a.createdAt);
+    if (disposed) return;
     renderResults();
   }
 
   function render() {
+    if (disposed) return;
     container.innerHTML = '';
 
     const section = document.createElement('section');
@@ -138,4 +141,8 @@ export function createSearchPage(container: HTMLElement): void {
   }
 
   render();
+
+  return () => {
+    disposed = true;
+  };
 }

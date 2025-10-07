@@ -4,13 +4,36 @@ import { db } from '@/lib/db';
 import { makeDailyICS } from '@/lib/ics';
 import { createErrorTray } from '@/components/error-tray';
 
-export function createSettingsPage(container: HTMLElement): void {
+export function createSettingsPage(container: HTMLElement): () => void {
   container.innerHTML = '';
 
   let showErrors = false;
   let errorTrayElement: HTMLElement | null = null;
+  let disposed = false;
+  const cleanupFns: Array<() => void> = [];
 
-  // Load settings
+  const registerCleanup = (fn: () => void) => cleanupFns.push(fn);
+
+  const destroyErrorTray = () => {
+    if (errorTrayElement) {
+      const cleanup = (errorTrayElement as any).__cleanup;
+      if (typeof cleanup === 'function') cleanup();
+      errorTrayElement.remove();
+      errorTrayElement = null;
+    }
+  };
+
+  const runCleanups = () => {
+    destroyErrorTray();
+    while (cleanupFns.length) {
+      try {
+        cleanupFns.pop()?.();
+      } catch (error) {
+        console.error('[Settings] Cleanup error', error);
+      }
+    }
+  };
+
   loadSettings();
 
   async function exportJson() {
@@ -41,6 +64,8 @@ export function createSettingsPage(container: HTMLElement): void {
   }
 
   function render() {
+    if (disposed) return;
+    runCleanups();
     container.innerHTML = '';
 
     const section = document.createElement('section');
@@ -76,10 +101,11 @@ export function createSettingsPage(container: HTMLElement): void {
     typefaceSelect.appendChild(optionA);
     typefaceSelect.appendChild(optionB);
 
-    // Set current value
-    settings.subscribe((s) => {
+    const unsubscribe = settings.subscribe((s) => {
+      if (disposed) return;
       typefaceSelect.value = s?.typeface || 'pairA';
     });
+    registerCleanup(unsubscribe);
 
     typefaceSelect.addEventListener('change', (e) => {
       const value = (e.target as HTMLSelectElement).value as 'pairA' | 'pairB';
@@ -180,6 +206,7 @@ export function createSettingsPage(container: HTMLElement): void {
   }
 
   function toggleErrorTray() {
+    if (disposed) return;
     const errorTrayContainer = document.getElementById('error-tray-container');
     if (!errorTrayContainer) return;
 
@@ -189,15 +216,14 @@ export function createSettingsPage(container: HTMLElement): void {
       }
       errorTrayContainer.appendChild(errorTrayElement);
     } else {
-      if (errorTrayElement) {
-        // Call cleanup if available
-        const cleanup = (errorTrayElement as any).__cleanup;
-        if (cleanup) cleanup();
-        errorTrayElement.remove();
-        errorTrayElement = null;
-      }
+      destroyErrorTray();
     }
   }
 
   render();
+
+  return () => {
+    disposed = true;
+    runCleanups();
+  };
 }

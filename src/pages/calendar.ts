@@ -3,7 +3,7 @@ import { listAllGreats } from '@/lib/db';
 
 type Day = { ymd: string; filled: boolean; isFuture: boolean };
 
-export function createCalendarPage(container: HTMLElement): void {
+export function createCalendarPage(container: HTMLElement): () => void {
   container.innerHTML = '';
 
   const today = new Date();
@@ -11,9 +11,11 @@ export function createCalendarPage(container: HTMLElement): void {
   let month = today.getMonth();
   let year = today.getFullYear();
   let filledSet = new Set<string>();
+  let disposed = false;
 
   async function loadData() {
     const all = await listAllGreats();
+    if (disposed) return;
     filledSet = new Set(all.map(g => g.ymd));
     render();
   }
@@ -59,6 +61,7 @@ export function createCalendarPage(container: HTMLElement): void {
   }
 
   function render() {
+    if (disposed) return;
     const days = computeMonthDays(year, month);
     const canGoNext = year < today.getFullYear() || (year === today.getFullYear() && month < today.getMonth());
 
@@ -137,4 +140,8 @@ export function createCalendarPage(container: HTMLElement): void {
   }
 
   loadData();
+
+  return () => {
+    disposed = true;
+  };
 }

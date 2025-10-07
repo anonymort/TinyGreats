@@ -9,7 +9,7 @@ import { iconToSVG } from '@/lib/icons';
 
 const today = ymdFromDate(new Date());
 
-export function createHomePage(container: HTMLElement): void {
+export function createHomePage(container: HTMLElement): () => void {
   container.innerHTML = '';
 
   let entry = '';
@@ -17,77 +17,37 @@ export function createHomePage(container: HTMLElement): void {
   let saved: Great | null = null;
   let emojiPicker: EmojiPicker | null = null;
   let recent: string[] = [];
+  let disposed = false;
+  const cleanupFns: Array<() => void> = [];
 
-  // Load recent emojis
+  const registerCleanup = (fn: () => void) => cleanupFns.push(fn);
+
+  const runCleanups = () => {
+    while (cleanupFns.length) {
+      try {
+        cleanupFns.pop()?.();
+      } catch (error) {
+        console.error('[Home] Cleanup error', error);
+      }
+    }
+    emojiPicker = null;
+  };
+
   try {
     recent = JSON.parse(localStorage.getItem('recent_emojis') || '[]');
   } catch {
     recent = [];
   }
 
-  // Load existing entry
-  getGreatByYmd(today).then((existing) => {
-    if (existing) {
-      saved = existing;
-      entry = existing.entry;
-      mood = existing.mood ?? '';
-      clearBadge();
-      render();
-    } else {
-      setBadge(1);
-    }
-  });
-
-  function save() {
-    const text = entry.trim();
-    if (!text) return;
-
-    const g: Great = {
-      id: crypto.randomUUID(),
-      ymd: today,
-      entry: text.slice(0, 280),
-      mood: mood || undefined,
-      createdAt: Date.now(),
-      v: 1
-    };
-
-    upsertGreat(g).then(() => {
-      saved = g;
-      clearBadge();
-      try {
-        navigator.vibrate?.(30);
-      } catch {}
-
-      const card = document.querySelector('#today-card');
-      if (card) bloomElement(card as HTMLElement);
-
-      if (mood) {
-        recent = Array.from(new Set([mood, ...recent])).slice(0, 8);
-        localStorage.setItem('recent_emojis', JSON.stringify(recent));
-      }
-
-      render();
-    });
-  }
-
-  function resetEdit() {
-    saved = null;
-    render();
-    setTimeout(() => {
-      const input = document.querySelector('#entry-input') as HTMLInputElement;
-      input?.focus();
-    }, 100);
-  }
-
   function render() {
+    if (disposed) return;
+    runCleanups();
     container.innerHTML = '';
 
-    // Background gradient
     const bgGradient = document.createElement('div');
     bgGradient.className = 'absolute inset-0 bg-gradient-to-br from-purple-50 via-cyan-50 to-green-50 -z-10';
     container.appendChild(bgGradient);
 
-    // Main card
     const card = document.createElement('section');
     card.id = 'today-card';
     card.className = 'relative glass bg-slate-50/70 border border-slate-200 rounded-3xl p-8 shadow-xl shadow-purple-100';
@@ -100,7 +60,6 @@ export function createHomePage(container: HTMLElement): void {
 
     container.appendChild(card);
 
-    // Footer message
     const footer = document.createElement('div');
     footer.className = 'mt-8 text-center';
     const footerText = document.createElement('p');
@@ -115,10 +74,54 @@ export function createHomePage(container: HTMLElement): void {
     container.appendChild(footer);
   }
 
+  async function save() {
+    const text = entry.trim();
+    if (!text) return;
+
+    const g: Great = {
+      id: crypto.randomUUID(),
+      ymd: today,
+      entry: text.slice(0, 280),
+      mood: mood || undefined,
+      createdAt: Date.now(),
+      v: 1
+    };
+
+    await upsertGreat(g);
+    if (disposed) return;
+
+    saved = g;
+    clearBadge();
+
+    try {
+      navigator.vibrate?.(30);
+    } catch {}
+
+    const card = document.querySelector('#today-card');
+    if (card) bloomElement(card as HTMLElement);
+
+    if (mood) {
+      recent = Array.from(new Set([mood, ...recent])).slice(0, 8);
+      localStorage.setItem('recent_emojis', JSON.stringify(recent));
+    }
+
+    render();
+  }
+
+  function resetEdit() {
+    if (disposed) return;
+    saved = null;
+    render();
+    setTimeout(() => {
+      if (disposed) return;
+      const input = document.querySelector('#entry-input') as HTMLInputElement | null;
+      input?.focus();
+    }, 100);
+  }
+
   function renderEntryForm(): HTMLElement {
     const form = document.createElement('div');
 
-    // Header
     const header = document.createElement('div');
     header.className = 'flex items-center gap-3 mb-6';
 
@@ -141,13 +144,13 @@ export function createHomePage(container: HTMLElement): void {
     header.appendChild(textContainer);
     form.appendChild(header);
 
-    // Input area
     const inputArea = document.createElement('div');
     inputArea.className = 'space-y-4';
 
-    // Input field with character counter
     const inputWrapper = document.createElement('div');
     inputWrapper.className = 'relative';
+
+    let saveBtn: HTMLButtonElement;
 
     const input = document.createElement('input');
     input.id = 'entry-input';
@@ -156,27 +159,25 @@ export function createHomePage(container: HTMLElement): void {
     input.placeholder = 'Something wonderful happened...';
     input.value = entry;
     input.className = 'w-full px-4 py-4 rounded-2xl glass-subtle bg-slate-100/50 border border-slate-300 text-slate-900 placeholder-slate-400 focus-ring transition-all duration-200';
-    input.addEventListener('input', (e) => {
-      entry = (e.target as HTMLInputElement).value;
-      updateCharCounter();
-    });
-
-    const cleanup1 = addFocusBloom(input);
 
     const charCounter = document.createElement('div');
     charCounter.id = 'char-counter';
     charCounter.className = 'absolute right-3 top-1/2 -translate-y-1/2 text-slate-500 text-sm';
     charCounter.textContent = String(280 - entry.length);
 
-    function updateCharCounter() {
+    input.addEventListener('input', (e) => {
+      entry = (e.target as HTMLInputElement).value;
       charCounter.textContent = String(280 - entry.length);
-    }
+      if (saveBtn) saveBtn.disabled = !entry.trim();
+    });
+
+    const focusCleanup = addFocusBloom(input);
+    registerCleanup(focusCleanup);
 
     inputWrapper.appendChild(input);
     inputWrapper.appendChild(charCounter);
     inputArea.appendChild(inputWrapper);
 
-    // Emoji + Save buttons
     const buttonRow = document.createElement('div');
     buttonRow.className = 'flex items-center gap-3';
 
@@ -185,50 +186,40 @@ export function createHomePage(container: HTMLElement): void {
     emojiBtn.textContent = mood || '😊';
     emojiBtn.setAttribute('aria-label', 'Pick mood emoji');
 
-    emojiPicker = new EmojiPicker({
+    emojiPicker?.destroy();
+    const picker = new EmojiPicker({
       anchor: emojiBtn,
       recent,
       onSelect: (emoji) => {
         mood = emoji;
         emojiBtn.textContent = mood || '😊';
-        if (emojiPicker) emojiPicker.updateRecent(recent);
+        picker.updateRecent(recent);
       }
     });
+    emojiPicker = picker;
+    emojiBtn.addEventListener('click', () => picker.toggle());
+    registerCleanup(() => picker.destroy());
 
-    emojiBtn.addEventListener('click', () => emojiPicker?.toggle());
-
-    const saveBtn = document.createElement('button');
+    saveBtn = document.createElement('button');
     saveBtn.className = 'flex-1 flex items-center justify-center gap-2 px-6 py-4 rounded-2xl bg-purple-600 hover:bg-purple-700 text-white font-medium transition-all duration-200 btn-animate focus-ring disabled:opacity-50 disabled:cursor-not-allowed';
     saveBtn.disabled = !entry.trim();
-
-    input.addEventListener('input', () => {
-      saveBtn.disabled = !entry.trim();
-    });
-
     saveBtn.appendChild(iconToSVG(Save, 18));
     saveBtn.appendChild(document.createTextNode('Save Gratitude'));
     saveBtn.addEventListener('click', save);
 
-    const cleanup2 = addClickPulse(saveBtn);
+    const clickCleanup = addClickPulse(saveBtn);
+    registerCleanup(clickCleanup);
 
     buttonRow.appendChild(emojiBtn);
     buttonRow.appendChild(saveBtn);
     inputArea.appendChild(buttonRow);
 
-    // Tip
     const tip = document.createElement('p');
     tip.className = 'text-slate-500 text-sm text-center';
     tip.textContent = '💡 Tip: Add an emoji to capture your mood';
     inputArea.appendChild(tip);
 
     form.appendChild(inputArea);
-
-    // Store cleanup functions
-    (form as any).__cleanup = () => {
-      cleanup1();
-      cleanup2();
-      emojiPicker?.destroy();
-    };
 
     return form;
   }
@@ -286,4 +277,22 @@ export function createHomePage(container: HTMLElement): void {
   }
 
   render();
+
+  getGreatByYmd(today).then((existing) => {
+    if (disposed) return;
+    if (existing) {
+      saved = existing;
+      entry = existing.entry;
+      mood = existing.mood ?? '';
+      clearBadge();
+      render();
+    } else {
+      setBadge(1);
+    }
+  });
+
+  return () => {
+    disposed = true;
+    runCleanups();
+  };
 }

@@ -44,38 +44,39 @@ async function init() {
   // Setup router
   router.on('/', () => {
     console.log('[Router] Navigating to home');
-    createHomePage(contentContainer);
+    return createHomePage(contentContainer);
   });
 
   router.on('/calendar', () => {
     console.log('[Router] Navigating to calendar');
-    createCalendarPage(contentContainer);
+    return createCalendarPage(contentContainer);
   });
 
   router.on('/day/:ymd', (params) => {
     console.log('[Router] Navigating to day:', params.ymd);
-    createDayPage(contentContainer, params.ymd);
+    return createDayPage(contentContainer, params.ymd);
   });
 
   router.on('/gallery', () => {
     console.log('[Router] Navigating to gallery');
-    createGalleryPage(contentContainer);
+    return createGalleryPage(contentContainer);
   });
 
   router.on('/search', () => {
     console.log('[Router] Navigating to search');
-    createSearchPage(contentContainer);
+    return createSearchPage(contentContainer);
   });
 
   router.on('/settings', () => {
     console.log('[Router] Navigating to settings');
-    createSettingsPage(contentContainer);
+    return createSettingsPage(contentContainer);
   });
 
   // 404 fallback
   router.on('*', () => {
     console.log('[Router] 404 - redirecting to home');
     router.navigate('/');
+    return () => {};
   });
 
   console.log('[App] Tiny Gratitude initialized');
