@@ -10,7 +10,7 @@
     "start": "serve -s dist -p $PORT"
   },
   "engines": {
-    "node": ">=18"
+    "node": ">=20.19.0"
   },
   "devDependencies": {
     "autoprefixer": "^10.4.21",
