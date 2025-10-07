@@ -1,6 +1,7 @@
 import { Calendar, Image, Search, Settings, Sparkles } from 'lucide';
 import { settings } from '@/lib/settings';
 import { iconToSVG } from '@/lib/icons';
+import { addSparkleHover } from '@/lib/animations';
 
 export function createLayout(_container: HTMLElement): HTMLElement {
   const layout = document.createElement('div');
@@ -51,6 +52,11 @@ function createLogo(): HTMLElement {
 
   const iconEl = iconToSVG(Sparkles, 20);
   iconEl.classList.add('text-amber-500');
+  iconEl.style.display = 'inline-block'; // Needed for transform to work
+  iconEl.style.transformOrigin = 'center';
+
+  // Add sparkle hover animation
+  addSparkleHover(iconEl);
 
   const text = document.createElement('span');
   text.className = 'font-serif';

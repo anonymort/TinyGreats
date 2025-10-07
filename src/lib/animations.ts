@@ -23,3 +23,21 @@ export function bloomElement(node: HTMLElement) {
     { duration: 0.4 } as any
   );
 }
+
+export function addSparkleHover(node: HTMLElement) {
+  function onMouseEnter() {
+    animate(
+      node,
+      {
+        transform: ['rotate(0deg) scale(1)', 'rotate(180deg) scale(1.1)', 'rotate(360deg) scale(1)']
+      } as any,
+      {
+        duration: 0.6,
+        easing: [0.4, 0.0, 0.2, 1] // ease-in-out cubic bezier
+      } as any
+    );
+  }
+
+  node.addEventListener('mouseenter', onMouseEnter);
+  return () => node.removeEventListener('mouseenter', onMouseEnter);
+}

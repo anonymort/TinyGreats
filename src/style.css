@@ -62,6 +62,12 @@ body {
   @apply scale-95;
 }
 
+/* Sparkle icon smooth transform */
+svg {
+  will-change: transform;
+  transform: translateZ(0); /* GPU acceleration */
+}
+
 /* Respect reduced motion preferences */
 @media (prefers-reduced-motion: reduce) {
   *,
