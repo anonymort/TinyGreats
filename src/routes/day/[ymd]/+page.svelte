@@ -41,12 +41,12 @@
   import { clickPulse, focusBloom } from '@/lib/animations';
 </script>
 
-<section class="mt-6 rounded-2xl border border-ctp-surface1 p-5 bg-ctp-surface0">
+<section class="mt-6 rounded-2xl border border-slate-200 bg-white p-5 shadow-sm">
   <h1 class="text-lg font-serif mb-4">{ymd}</h1>
   <div class="relative flex items-center gap-2">
-    <input use:focusBloom class="flex-1 rounded-lg border border-ctp-surface1 bg-ctp-surface0 px-3 py-2 text-ctp-text placeholder-ctp-subtext0 focus-ring" type="text" bind:value={entry} maxlength="280" placeholder="Add a great for this day…" />
-    <button bind:this={emojiBtn} aria-label="Pick emoji" class="w-10 h-10 rounded-lg border border-ctp-surface1 bg-ctp-surface0 text-ctp-text transition-colors hover:bg-ctp-surface1 focus-ring" on:click={() => pickerOpen = !pickerOpen}>{mood || '😊'}</button>
+    <input use:focusBloom class="flex-1 rounded-lg border border-slate-300 bg-white px-3 py-2 text-slate-900 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-slate-300" type="text" bind:value={entry} maxlength="280" placeholder="Add a great for this day…" />
+    <button bind:this={emojiBtn} aria-label="Pick emoji" class="w-10 h-10 rounded-lg border border-slate-300 bg-white text-base transition-colors hover:bg-slate-50" on:click={() => pickerOpen = !pickerOpen}>{mood || '😊'}</button>
     <EmojiPicker {recent} bind:value={mood} bind:open={pickerOpen} anchor={emojiBtn} on:select={(e) => mood = e.detail} />
-    <button use:clickPulse on:click={save} class="rounded-lg px-4 py-2 bg-ctp-text text-ctp-base transition-colors hover:bg-ctp-surface2 focus-ring disabled:opacity-50" disabled={!entry.trim()}>Save</button>
+    <button use:clickPulse on:click={save} class="rounded-lg px-4 py-2 bg-slate-900 text-white transition-colors hover:bg-slate-700 disabled:opacity-50" disabled={!entry.trim()}>Save</button>
   </div>
 </section>

@@ -20,14 +20,15 @@ export const SETTINGS_KEY = 'settings';
 
 export async function getSettings(): Promise<Settings> {
   const row = await db.settings.get(SETTINGS_KEY);
-  return (
-    row?.value ?? {
-      theme: 'system',
-      badgeNudges: true,
-      encryption: false,
-      typeface: 'pairA'
-    }
-  );
+  const fallback: Settings = {
+    badgeNudges: true,
+    encryption: false,
+    typeface: 'pairA'
+  };
+  if (!row?.value) return fallback;
+
+  const { theme: _legacyTheme, ...rest } = row.value as Settings & { theme?: unknown };
+  return { ...fallback, ...rest };
 }
 
 export async function putSettings(value: Settings) {
@@ -53,4 +54,3 @@ export async function listAllGreats() {
 export async function deleteGreat(id: string) {
   return db.greats.delete(id);
 }
-

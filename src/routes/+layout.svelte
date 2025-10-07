@@ -2,12 +2,12 @@
   import '../app.css';
   import { onMount } from 'svelte';
   import { afterNavigate } from '$app/navigation';
-  import { settings, loadSettings, themeClass, updateSettings } from '@/lib/stores';
+  import { settings, loadSettings } from '@/lib/stores';
   import { requestPersistentStorage } from '@/lib/storage';
   import { installGlobalHandler } from '@/lib/errorLog';
   
   // Beautiful Lucide icons
-  import { Calendar, Image, Search, Settings, Sun, Moon, Sparkles } from 'lucide-svelte';
+  import { Calendar, Image, Search, Settings, Sparkles } from 'lucide-svelte';
 
   onMount(() => {
     loadSettings();
@@ -25,21 +25,14 @@
     }
   });
 
-  $: theme = $themeClass;
   $: tfClass = $settings?.typeface === 'pairB' ? 'tf-b' : 'tf-a';
-  $: isDark = theme === 'dark';
-
-  function toggleTheme() {
-    const next = ($settings?.theme ?? 'system') === 'midnight' ? 'daylight' : 'midnight';
-    updateSettings({ theme: next });
-  }
 </script>
 
 <svelte:head>
   <title>Tiny Gratitude</title>
 </svelte:head>
 
-<div class="{theme} min-h-full {tfClass}" class:mocha={isDark} class:latte={!isDark}>
+<div class="min-h-full {tfClass}">
   <!-- Beautiful glassmorphism header -->
   <header class="sticky top-0 z-50 glass-subtle bg-ctp-base/80 border-b border-ctp-surface0/50">
     <nav class="mx-auto max-w-screen-sm px-6 h-16 flex items-center justify-between">
@@ -83,24 +76,6 @@
         >
           <Settings size={18} />
         </a>
-        
-        <!-- Beautiful theme toggle with smooth transitions -->
-        <div class="ml-2 w-px h-6 bg-ctp-surface1"></div>
-        <button 
-          class="group ml-2 p-2.5 rounded-xl bg-ctp-surface0/70 text-ctp-subtext1 hover:text-ctp-yellow hover:bg-ctp-surface1 transition-all duration-300 btn-animate focus-ring" 
-          on:click={toggleTheme} 
-          aria-label={isDark ? 'Switch to light mode' : 'Switch to dark mode'}
-          title={isDark ? 'Switch to light mode' : 'Switch to dark mode'}
-        >
-          <div class="relative w-[18px] h-[18px]">
-            <div class="absolute inset-0 transition-all duration-300 {isDark ? 'opacity-100 rotate-0 scale-100' : 'opacity-0 rotate-90 scale-75'}">
-              <Moon size={18} />
-            </div>
-            <div class="absolute inset-0 transition-all duration-300 {!isDark ? 'opacity-100 rotate-0 scale-100' : 'opacity-0 -rotate-90 scale-75'}">
-              <Sun size={18} />
-            </div>
-          </div>
-        </button>
       </div>
     </nav>
   </header>

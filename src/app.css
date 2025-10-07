@@ -2,93 +2,31 @@
 @tailwind components;
 @tailwind utilities;
 
-/* Theme Variables */
-:root {
-  /* Catppuccin Latte (Light) Theme */
-  --ctp-base: #eff1f5;
-  --ctp-mantle: #e6e9ef;
-  --ctp-crust: #dce0e8;
-  --ctp-surface0: #ccd0da;
-  --ctp-surface1: #bcc0cc;
-  --ctp-surface2: #acb0be;
-  --ctp-text: #4c4f69;
-  --ctp-subtext0: #6c6f85;
-  --ctp-subtext1: #5c5f77;
-  --ctp-mauve: #8839ef;
-  --ctp-sapphire: #209fb5;
-  --ctp-green: #40a02b;
-  --ctp-yellow: #df8e1d;
-  --ctp-peach: #fe640b;
-  --ctp-pink: #ea76cb;
-  --ctp-red: #d20f39;
-}
-
-/* Catppuccin Dark Theme (Mocha) */
-.dark {
-  --ctp-base: #1e1e2e;
-  --ctp-mantle: #181825;
-  --ctp-crust: #11111b;
-  --ctp-surface0: #313244;
-  --ctp-surface1: #45475a;
-  --ctp-surface2: #585b70;
-  --ctp-text: #cdd6f4;
-  --ctp-subtext0: #a6adc8;
-  --ctp-subtext1: #bac2de;
-  --ctp-mauve: #cba6f7;
-  --ctp-sapphire: #74c7ec;
-  --ctp-green: #a6e3a1;
-  --ctp-yellow: #f9e2af;
-  --ctp-peach: #fab387;
-  --ctp-pink: #f5c2e7;
-  --ctp-red: #f38ba8;
-}
-
-/* Custom classes using CSS variables */
-.bg-ctp-base { background-color: var(--ctp-base); }
-.bg-ctp-mantle { background-color: var(--ctp-mantle); }
-.bg-ctp-crust { background-color: var(--ctp-crust); }
-.bg-ctp-surface0 { background-color: var(--ctp-surface0); }
-.bg-ctp-surface1 { background-color: var(--ctp-surface1); }
-.bg-ctp-surface2 { background-color: var(--ctp-surface2); }
-
-.text-ctp-text { color: var(--ctp-text); }
-.text-ctp-subtext0 { color: var(--ctp-subtext0); }
-.text-ctp-subtext1 { color: var(--ctp-subtext1); }
-.text-ctp-mauve { color: var(--ctp-mauve); }
-.text-ctp-sapphire { color: var(--ctp-sapphire); }
-.text-ctp-green { color: var(--ctp-green); }
-.text-ctp-yellow { color: var(--ctp-yellow); }
-.text-ctp-peach { color: var(--ctp-peach); }
-.text-ctp-pink { color: var(--ctp-pink); }
-.text-ctp-red { color: var(--ctp-red); }
-
-.border-ctp-surface0 { border-color: var(--ctp-surface0); }
-.border-ctp-surface1 { border-color: var(--ctp-surface1); }
-.border-ctp-surface2 { border-color: var(--ctp-surface2); }
-
-html, body, #svelte {
+html,
+body,
+#svelte {
   height: 100%;
 }
 
 body {
-  @apply bg-ctp-base text-ctp-text font-sans;
-  transition: background-color 0.3s ease, color 0.3s ease;
+  @apply bg-slate-100 text-slate-900 font-sans;
+  transition: background-color 0.2s ease, color 0.2s ease;
 }
 
 /* Glass morphism base styles */
 .glass {
   backdrop-filter: blur(10px);
   -webkit-backdrop-filter: blur(10px);
-  border: 1px solid rgba(255, 255, 255, 0.1);
+  border: 1px solid rgba(255, 255, 255, 0.6);
 }
 
 .glass-subtle {
   backdrop-filter: blur(8px);
   -webkit-backdrop-filter: blur(8px);
-  border: 1px solid rgba(255, 255, 255, 0.05);
+  border: 1px solid rgba(255, 255, 255, 0.35);
 }
 
-/* View Transitions with smooth easing */
+/* View transitions with smooth easing */
 ::view-transition-old(root),
 ::view-transition-new(root) {
   animation-duration: 300ms;
@@ -97,7 +35,7 @@ body {
 
 /* Focus ring styles */
 .focus-ring {
-  @apply focus:outline-none focus:ring-2 focus:ring-ctp-mauve/60 focus:ring-offset-2 focus:ring-offset-ctp-base;
+  @apply focus:outline-none focus:ring-2 focus:ring-slate-400 focus:ring-offset-2 focus:ring-offset-slate-100;
 }
 
 /* Button animations */
@@ -123,10 +61,9 @@ body {
     transition-duration: 0.01ms !important;
     scroll-behavior: auto !important;
   }
-  
+
   .btn-animate:hover,
   .btn-animate:active {
     transform: none !important;
   }
 }
-

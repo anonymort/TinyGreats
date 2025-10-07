@@ -10,10 +10,8 @@ export type Great = {
 };
 
 export type Settings = {
-  theme: 'system' | 'daylight' | 'midnight';
   reminderHour?: number; // 0-23
   badgeNudges: boolean;
   encryption: boolean;
   typeface: 'pairA' | 'pairB';
 };
-

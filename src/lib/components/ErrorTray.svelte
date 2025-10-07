@@ -10,7 +10,7 @@
   });
 </script>
 
-<div class="rounded-xl border border-ctp-surface1 p-3 bg-ctp-surface0">
+<div class="rounded-xl border border-slate-200 bg-white p-3 shadow-sm">
   <div class="flex items-center justify-between mb-2">
     <div class="text-sm font-medium">Error Tray (local only)</div>
     <button class="text-xs underline" on:click={clear}>Clear</button>
