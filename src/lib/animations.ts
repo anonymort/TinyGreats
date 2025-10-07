@@ -24,7 +24,7 @@ export function bloomElement(node: HTMLElement) {
   );
 }
 
-export function addSparkleHover(node: HTMLElement) {
+export function addSparkleHover(node: HTMLElement | SVGElement) {
   function onMouseEnter() {
     animate(
       node,
