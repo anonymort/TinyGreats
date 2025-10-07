@@ -14,6 +14,14 @@
     <link rel="manifest" href="/manifest.webmanifest" />
     <link rel="icon" type="image/png" href="/icons/icon-192.png" />
     <title>Tiny Gratitude</title>
+
+    <!-- Prevent FOUC by setting background immediately -->
+    <style>
+      html, body {
+        background-color: #f1f5f9;
+        color: #0f172a;
+      }
+    </style>
   </head>
   <body class="h-full">
     <div id="app"></div>
