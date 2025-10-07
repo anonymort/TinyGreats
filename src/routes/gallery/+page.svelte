@@ -28,11 +28,11 @@
 <section>
   <div class="flex items-center justify-between mb-3">
     <h1 class="font-serif">Gallery</h1>
-    <button class="rounded px-3 py-1.5 border border-black/10 dark:border-white/10" on:click={togglePlay}>{autoplay ? 'Pause' : 'Play'}</button>
+    <button class="rounded px-3 py-1.5 border border-ctp-surface1 bg-ctp-surface0 text-ctp-text transition-colors hover:bg-ctp-surface1 focus-ring" on:click={togglePlay}>{autoplay ? 'Pause' : 'Play'}</button>
   </div>
   <div class="flex gap-4 snap-x overflow-x-auto">
     {#each items as g, i}
-      <div id={'g' + i} class="min-w-[85%] snap-center rounded-2xl border border-black/10 dark:border-white/10 p-5 bg-white/70 dark:bg-black/20">
+      <div id={'g' + i} class="min-w-[85%] snap-center rounded-2xl border border-ctp-surface1 p-5 bg-ctp-surface0">
         <div class="text-5xl mb-2">{g.mood ?? '✨'}</div>
         <div class="text-sm opacity-60">{g.ymd}</div>
         <div class="text-lg font-medium">{g.entry}</div>
@@ -40,4 +40,3 @@
     {/each}
   </div>
 </section>
-

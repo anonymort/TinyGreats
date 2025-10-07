@@ -10,7 +10,7 @@
   });
 </script>
 
-<div class="rounded-xl border border-black/10 dark:border-white/10 p-3 bg-white/70 dark:bg-black/20">
+<div class="rounded-xl border border-ctp-surface1 p-3 bg-ctp-surface0">
   <div class="flex items-center justify-between mb-2">
     <div class="text-sm font-medium">Error Tray (local only)</div>
     <button class="text-xs underline" on:click={clear}>Clear</button>
@@ -28,4 +28,3 @@
     </ul>
   {/if}
 </div>
-

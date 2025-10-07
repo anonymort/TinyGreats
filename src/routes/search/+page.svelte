@@ -26,14 +26,14 @@
 <section class="space-y-4">
   <h1 class="font-serif text-xl">Search & Filter</h1>
   <div class="grid grid-cols-1 sm:grid-cols-4 gap-2">
-    <input class="rounded border border-black/10 dark:border-white/10 px-3 py-2 bg-transparent" placeholder="Text contains…" bind:value={q} on:input={run} />
-    <input class="rounded border border-black/10 dark:border-white/10 px-3 py-2 bg-transparent" placeholder="Emoji (e.g., 😊)" bind:value={emoji} maxlength="2" on:input={run} />
-    <input class="rounded border border-black/10 dark:border-white/10 px-3 py-2 bg-transparent" type="date" bind:value={start} on:change={run} />
-    <input class="rounded border border-black/10 dark:border-white/10 px-3 py-2 bg-transparent" type="date" bind:value={end} on:change={run} />
+    <input class="rounded border border-ctp-surface1 bg-ctp-surface0 px-3 py-2 text-ctp-text placeholder-ctp-subtext0 focus-ring" placeholder="Text contains…" bind:value={q} on:input={run} />
+    <input class="rounded border border-ctp-surface1 bg-ctp-surface0 px-3 py-2 text-ctp-text placeholder-ctp-subtext0 focus-ring" placeholder="Emoji (e.g., 😊)" bind:value={emoji} maxlength="2" on:input={run} />
+    <input class="rounded border border-ctp-surface1 bg-ctp-surface0 px-3 py-2 text-ctp-text focus-ring" type="date" bind:value={start} on:change={run} />
+    <input class="rounded border border-ctp-surface1 bg-ctp-surface0 px-3 py-2 text-ctp-text focus-ring" type="date" bind:value={end} on:change={run} />
   </div>
-  <div class="divide-y divide-black/5 dark:divide-white/10">
+  <div class="divide-y divide-ctp-surface1">
     {#each results as g}
-      <a class="flex items-start gap-3 py-3 hover:bg-black/5 dark:hover:bg-white/5 rounded px-2" href={'/day/' + g.ymd}>
+      <a class="flex items-start gap-3 py-3 hover:bg-ctp-surface1 rounded px-2 transition-colors" href={'/day/' + g.ymd}>
         <div class="text-2xl">{g.mood ?? '✨'}</div>
         <div class="flex-1">
           <div class="text-xs opacity-60">{g.ymd}</div>
@@ -46,4 +46,3 @@
     {/if}
   </div>
 </section>
-

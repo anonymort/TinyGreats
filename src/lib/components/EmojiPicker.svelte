@@ -30,21 +30,20 @@
 </script>
 
 {#if open}
-  <div bind:this={panel} role="dialog" aria-label="Emoji picker" class="absolute z-50 mt-2 rounded-xl border border-black/10 dark:border-white/10 bg-white/95 dark:bg-black/90 shadow-lg p-2 w-56">
+  <div bind:this={panel} role="dialog" aria-label="Emoji picker" class="absolute z-50 mt-2 rounded-xl border border-ctp-surface1 bg-ctp-surface0 shadow-lg p-2 w-56">
     {#if recent.length}
       <div class="mb-1 text-[11px] opacity-60 px-1">Recent</div>
       <div class="grid grid-cols-8 gap-1 mb-2">
         {#each recent as e}
-          <button class="h-8 w-8 rounded hover:bg-black/5 dark:hover:bg-white/10" on:click={() => pick(e)}>{e}</button>
+          <button class="h-8 w-8 rounded text-ctp-text hover:bg-ctp-surface1" on:click={() => pick(e)}>{e}</button>
         {/each}
       </div>
     {/if}
     <div class="mb-1 text-[11px] opacity-60 px-1">Popular</div>
     <div class="grid grid-cols-8 gap-1">
       {#each EMOJIS as e}
-        <button class="h-8 w-8 rounded hover:bg-black/5 dark:hover:bg.white/10" on:click={() => pick(e)}>{e}</button>
+        <button class="h-8 w-8 rounded text-ctp-text hover:bg-ctp-surface1" on:click={() => pick(e)}>{e}</button>
       {/each}
     </div>
   </div>
 {/if}
-

@@ -37,7 +37,7 @@
 
   <div class="space-y-2">
     <label for="theme-select" class="block text-sm opacity-80">Theme</label>
-    <select id="theme-select" class="rounded border border-black/10 dark:border-white/10 bg-transparent px-3 py-2" on:change={(e) => updateSettings({ theme: (e.target as HTMLSelectElement).value as any })}>
+    <select id="theme-select" class="rounded border border-ctp-surface1 bg-ctp-surface0 px-3 py-2 text-ctp-text focus-ring" on:change={(e) => updateSettings({ theme: (e.target as HTMLSelectElement).value as any })}>
       <option value="system" selected={$settings?.theme === 'system'}>System</option>
       <option value="daylight" selected={$settings?.theme === 'daylight'}>Daylight</option>
       <option value="midnight" selected={$settings?.theme === 'midnight'}>Midnight</option>
@@ -46,7 +46,7 @@
 
   <div class="space-y-2">
     <label for="typeface-select" class="block text-sm opacity-80">Typeface</label>
-    <select id="typeface-select" class="rounded border border-black/10 dark:border-white/10 bg-transparent px-3 py-2" on:change={(e) => updateSettings({ typeface: (e.target as HTMLSelectElement).value as any })}>
+    <select id="typeface-select" class="rounded border border-ctp-surface1 bg-ctp-surface0 px-3 py-2 text-ctp-text focus-ring" on:change={(e) => updateSettings({ typeface: (e.target as HTMLSelectElement).value as any })}>
       <option value="pairA" selected={$settings?.typeface === 'pairA'}>Serif prompt + Humanist sans</option>
       <option value="pairB" selected={$settings?.typeface === 'pairB'}>Serif prompt + Geometric sans</option>
     </select>
@@ -55,8 +55,8 @@
   <div class="space-y-2">
     <p class="block text-sm opacity-80">Export / Import</p>
     <div class="flex gap-3 items-center">
-      <button class="rounded px-3 py-1.5 border border-black/10 dark:border-white/10" on:click={exportJson}>Export JSON</button>
-      <label for="import-file" class="rounded px-3 py-1.5 border border-black/10 dark:border-white/10 cursor-pointer">
+      <button class="rounded px-3 py-1.5 border border-ctp-surface1 bg-ctp-surface0 text-ctp-text transition-colors hover:bg-ctp-surface1 focus-ring" on:click={exportJson}>Export JSON</button>
+      <label for="import-file" class="rounded px-3 py-1.5 border border-ctp-surface1 bg-ctp-surface0 text-ctp-text cursor-pointer transition-colors hover:bg-ctp-surface1 focus-ring">
         Import JSON <input id="import-file" type="file" accept="application/json" class="hidden" on:change={importJson} />
       </label>
     </div>
@@ -64,12 +64,12 @@
 
   <div class="space-y-2">
     <p class="block text-sm opacity-80">Reminders without servers</p>
-    <button class="rounded px-3 py-1.5 border border-black/10 dark:border-white/10" on:click={makeIcs}>Download .ics (daily)</button>
+    <button class="rounded px-3 py-1.5 border border-ctp-surface1 bg-ctp-surface0 text-ctp-text transition-colors hover:bg-ctp-surface1 focus-ring" on:click={makeIcs}>Download .ics (daily)</button>
   </div>
 
   <div class="space-y-2">
     <p class="block text-sm opacity-80">Error Tray</p>
-    <button class="rounded px-3 py-1.5 border border-black/10 dark:border-white/10" on:click={() => showErrors = !showErrors}>{showErrors ? 'Hide' : 'Show'} errors</button>
+    <button class="rounded px-3 py-1.5 border border-ctp-surface1 bg-ctp-surface0 text-ctp-text transition-colors hover:bg-ctp-surface1 focus-ring" on:click={() => showErrors = !showErrors}>{showErrors ? 'Hide' : 'Show'} errors</button>
     {#if showErrors}
       <ErrorTray />
     {/if}
