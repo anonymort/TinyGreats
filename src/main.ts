@@ -79,6 +79,12 @@ async function init() {
     return () => {};
   });
 
+  // Start router - navigate to current hash or default to home
+  const currentHash = window.location.hash.slice(1);
+  if (!currentHash) {
+    router.navigate('/');
+  }
+
   console.log('[App] Tiny Gratitude initialized');
 }
 

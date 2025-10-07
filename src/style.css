@@ -79,18 +79,3 @@ body {
   }
 }
 
-/* Dark mode support */
-@media (prefers-color-scheme: dark) {
-  body {
-    @apply bg-slate-900 text-slate-100;
-  }
-
-  .glass-subtle {
-    background-color: rgba(15, 23, 42, 0.8);
-    border-color: rgba(255, 255, 255, 0.1);
-  }
-
-  .focus-ring {
-    @apply focus:ring-offset-slate-900;
-  }
-}
