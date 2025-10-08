@@ -2,7 +2,7 @@ import { settings, updateSettings, loadSettings } from '@/lib/settings';
 import { downloadBlob } from '@/lib/storage';
 import { db } from '@/lib/db';
 import { makeDailyICS } from '@/lib/ics';
-import { createErrorTray } from '@/components/error-tray';
+import { createErrorTray, errorTrayCleanups } from '@/components/error-tray';
 
 export function createSettingsPage(container: HTMLElement): () => void {
   container.innerHTML = '';
@@ -16,7 +16,7 @@ export function createSettingsPage(container: HTMLElement): () => void {
 
   const destroyErrorTray = () => {
     if (errorTrayElement) {
-      const cleanup = (errorTrayElement as any).__cleanup;
+      const cleanup = errorTrayCleanups.get(errorTrayElement);
       if (typeof cleanup === 'function') cleanup();
       errorTrayElement.remove();
       errorTrayElement = null;
@@ -54,13 +54,35 @@ export function createSettingsPage(container: HTMLElement): () => void {
     const file = input.files?.[0];
     if (!file) return;
 
-    const text = await file.text();
-    const data = JSON.parse(text);
+    try {
+      const text = await file.text();
+      const data = JSON.parse(text);
 
-    if (Array.isArray(data.greats)) await db.greats.bulkPut(data.greats);
-    if (Array.isArray(data.settings)) await db.settings.bulkPut(data.settings);
+      // Validate data structure
+      if (!data || typeof data !== 'object') {
+        alert('Invalid import file: Expected JSON object.');
+        return;
+      }
 
-    alert('Import complete.');
+      let importedCount = 0;
+
+      if (Array.isArray(data.greats)) {
+        await db.greats.bulkPut(data.greats);
+        importedCount += data.greats.length;
+      }
+
+      if (Array.isArray(data.settings)) {
+        await db.settings.bulkPut(data.settings);
+      }
+
+      alert(`Import complete. Imported ${importedCount} gratitude entries.`);
+    } catch (error) {
+      console.error('[Settings] Import error:', error);
+      alert(`Import failed: ${error instanceof Error ? error.message : 'Unknown error'}`);
+    } finally {
+      // Clear the file input so the same file can be imported again
+      input.value = '';
+    }
   }
 
   function render() {

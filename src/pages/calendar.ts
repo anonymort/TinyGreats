@@ -27,9 +27,15 @@ export function createCalendarPage(container: HTMLElement): () => void {
     render();
   }
 
-  function computeMonthDays(y: number, m: number): Day[] {
-    const out: Day[] = [];
+  function computeMonthDays(y: number, m: number): (Day | null)[] {
+    const out: (Day | null)[] = [];
     const daysInMonth = new Date(y, m + 1, 0).getDate();
+    const firstDayOfWeek = new Date(y, m, 1).getDay(); // 0=Sun, 1=Mon, ..., 6=Sat
+
+    // Add empty cells for days before the month starts
+    for (let i = 0; i < firstDayOfWeek; i++) {
+      out.push(null);
+    }
 
     for (let d = 1; d <= daysInMonth; d++) {
       const date = new Date(y, m, d);
@@ -137,7 +143,13 @@ export function createCalendarPage(container: HTMLElement): () => void {
     grid.className = 'grid grid-cols-7 gap-2';
 
     days.forEach(d => {
-      if (d.isFuture) {
+      if (d === null) {
+        // Empty cell for calendar alignment
+        const emptyCell = document.createElement('div');
+        emptyCell.className = 'aspect-square';
+        emptyCell.setAttribute('aria-hidden', 'true');
+        grid.appendChild(emptyCell);
+      } else if (d.isFuture) {
         // Future dates: dimmed and non-clickable
         const futureDay = document.createElement('div');
         futureDay.className = 'aspect-square rounded-lg border border-slate-200/30 relative flex flex-col items-center justify-center opacity-40 cursor-not-allowed';

@@ -8,6 +8,7 @@ import { addFocusBloom, addClickPulse, bloomElement, addHeartFillHover } from '@
 import { iconToSVG } from '@/lib/icons';
 
 const today = ymdFromDate(new Date());
+const MAX_RECENT_EMOJIS = 8;
 
 export function createHomePage(container: HTMLElement): () => void {
   container.innerHTML = '';
@@ -101,7 +102,7 @@ export function createHomePage(container: HTMLElement): () => void {
     if (card) bloomElement(card as HTMLElement);
 
     if (mood) {
-      recent = Array.from(new Set([mood, ...recent])).slice(0, 8);
+      recent = Array.from(new Set([mood, ...recent])).slice(0, MAX_RECENT_EMOJIS);
       localStorage.setItem('recent_emojis', JSON.stringify(recent));
     }
 

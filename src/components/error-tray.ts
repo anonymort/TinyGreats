@@ -1,5 +1,8 @@
 import { getErrors, clearErrors, type ErrorEntry } from '@/lib/errorLog';
 
+// Export cleanup registry for error tray components
+export const errorTrayCleanups = new WeakMap<HTMLElement, () => void>();
+
 export function createErrorTray(): HTMLElement {
   const container = document.createElement('div');
   container.className = 'rounded-xl border border-slate-200 bg-white p-3 shadow-sm';
@@ -32,8 +35,8 @@ export function createErrorTray(): HTMLElement {
   // Auto-refresh every 2 seconds
   const interval = setInterval(() => renderErrors(listContainer), 2000);
 
-  // Cleanup function (call this when removing the component)
-  (container as any).__cleanup = () => clearInterval(interval);
+  // Store cleanup function in WeakMap
+  errorTrayCleanups.set(container, () => clearInterval(interval));
 
   return container;
 }

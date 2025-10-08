@@ -3,7 +3,19 @@ import type { Great } from '@/lib/types';
 import { EmojiPicker } from '@/components/emoji-picker';
 import { addFocusBloom, addClickPulse } from '@/lib/animations';
 
+const MAX_RECENT_EMOJIS = 8;
+
+// Validate ymd format (YYYY-MM-DD)
+function isValidYmd(ymd: string): boolean {
+  return /^\d{4}-\d{2}-\d{2}$/.test(ymd);
+}
+
 export function createDayPage(container: HTMLElement, ymd: string): () => void {
+  // Validate ymd parameter
+  if (!isValidYmd(ymd)) {
+    container.innerHTML = '<div class="text-center py-8 text-slate-600">Invalid date format</div>';
+    return () => {};
+  }
   container.innerHTML = '';
 
   let entry = '';
@@ -52,7 +64,7 @@ export function createDayPage(container: HTMLElement, ymd: string): () => void {
     saved = g;
 
     if (mood) {
-      recent = Array.from(new Set([mood, ...recent])).slice(0, 8);
+      recent = Array.from(new Set([mood, ...recent])).slice(0, MAX_RECENT_EMOJIS);
       localStorage.setItem('recent_emojis', JSON.stringify(recent));
     }
 
