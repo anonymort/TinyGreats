@@ -43,11 +43,15 @@ export function addSparkleHover(node: HTMLElement | SVGElement) {
 }
 
 export function addHeartFillHover(node: SVGElement) {
+  // Set fill to currentColor and start with 0 opacity
+  node.setAttribute('fill', 'currentColor');
+  node.setAttribute('fill-opacity', '0');
+
   function onMouseEnter() {
     animate(
       node,
       {
-        fill: ['none', 'currentColor']
+        fillOpacity: [0, 1]
       } as any,
       {
         duration: 0.5,
@@ -60,7 +64,7 @@ export function addHeartFillHover(node: SVGElement) {
     animate(
       node,
       {
-        fill: ['currentColor', 'none']
+        fillOpacity: [1, 0]
       } as any,
       {
         duration: 0.4,
