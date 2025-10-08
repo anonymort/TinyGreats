@@ -4,7 +4,7 @@ import { getGreatByYmd, upsertGreat } from '@/lib/db';
 import type { Great } from '@/lib/types';
 import { clearBadge, setBadge } from '@/lib/storage';
 import { EmojiPicker } from '@/components/emoji-picker';
-import { addFocusBloom, addClickPulse, bloomElement } from '@/lib/animations';
+import { addFocusBloom, addClickPulse, bloomElement, addHeartFillHover } from '@/lib/animations';
 import { iconToSVG } from '@/lib/icons';
 
 const today = ymdFromDate(new Date());
@@ -127,7 +127,11 @@ export function createHomePage(container: HTMLElement): () => void {
 
     const iconContainer = document.createElement('div');
     iconContainer.className = 'p-3 rounded-2xl bg-pink-100 text-pink-600';
-    iconContainer.appendChild(iconToSVG(Heart, 24));
+    const heartIcon = iconToSVG(Heart, 24);
+    heartIcon.style.display = 'inline-block';
+    const heartFillCleanup = addHeartFillHover(heartIcon);
+    registerCleanup(heartFillCleanup);
+    iconContainer.appendChild(heartIcon);
 
     const textContainer = document.createElement('div');
     const title = document.createElement('h1');

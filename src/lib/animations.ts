@@ -41,3 +41,38 @@ export function addSparkleHover(node: HTMLElement | SVGElement) {
   node.addEventListener('mouseenter', onMouseEnter);
   return () => node.removeEventListener('mouseenter', onMouseEnter);
 }
+
+export function addHeartFillHover(node: SVGElement) {
+  function onMouseEnter() {
+    animate(
+      node,
+      {
+        fill: ['none', 'currentColor']
+      } as any,
+      {
+        duration: 0.5,
+        easing: [0.4, 0.0, 0.2, 1] // ease-in-out cubic bezier
+      } as any
+    );
+  }
+
+  function onMouseLeave() {
+    animate(
+      node,
+      {
+        fill: ['currentColor', 'none']
+      } as any,
+      {
+        duration: 0.4,
+        easing: [0.4, 0.0, 0.2, 1]
+      } as any
+    );
+  }
+
+  node.addEventListener('mouseenter', onMouseEnter);
+  node.addEventListener('mouseleave', onMouseLeave);
+  return () => {
+    node.removeEventListener('mouseenter', onMouseEnter);
+    node.removeEventListener('mouseleave', onMouseLeave);
+  };
+}
