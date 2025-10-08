@@ -68,42 +68,75 @@ export function createGalleryPage(container: HTMLElement): () => void {
 
     const playBtn = document.createElement('button');
     playBtn.id = 'gallery-play-btn';
-    playBtn.className = 'rounded border border-slate-300 bg-white px-3 py-1.5 text-slate-900 hover:bg-slate-100 transition-colors';
+    playBtn.className = 'rounded border border-slate-300 bg-white px-3 py-1.5 text-slate-900 hover:bg-slate-100 transition-colors disabled:opacity-40 disabled:cursor-not-allowed';
     playBtn.textContent = autoplay ? 'Pause' : 'Play';
     playBtn.disabled = items.length === 0;
+    playBtn.title = items.length === 0 ? 'Add entries to enable slideshow' : 'Auto-browse your grateful moments';
     playBtn.addEventListener('click', togglePlay);
 
     header.appendChild(title);
     header.appendChild(playBtn);
     section.appendChild(header);
 
-    const carousel = document.createElement('div');
-    carousel.className = 'flex gap-4 snap-x overflow-x-auto';
+    // Empty state
+    if (items.length === 0) {
+      const emptyState = document.createElement('div');
+      emptyState.className = 'flex flex-col items-center justify-center py-16 px-6 text-center';
 
-    items.forEach((g, i) => {
-      const card = document.createElement('div');
-      card.id = 'g' + i;
-      card.className = 'min-w-[85%] snap-center rounded-2xl border border-slate-200 bg-white p-5 shadow-sm';
+      const iconContainer = document.createElement('div');
+      iconContainer.className = 'mb-6 text-8xl';
+      iconContainer.textContent = '📸';
 
-      const emoji = document.createElement('div');
-      emoji.className = 'text-5xl mb-2';
-      emoji.textContent = g.mood ?? '✨';
+      const heading = document.createElement('h2');
+      heading.className = 'text-2xl font-serif font-semibold text-slate-900 mb-2';
+      heading.textContent = 'No memories yet';
 
-      const date = document.createElement('div');
-      date.className = 'text-sm opacity-60';
-      date.textContent = g.ymd;
+      const description = document.createElement('p');
+      description.className = 'text-slate-600 mb-6 max-w-sm';
+      description.textContent = 'Start capturing your daily moments of gratitude. They\'ll appear here as a beautiful visual journey.';
 
-      const entryText = document.createElement('div');
-      entryText.className = 'text-lg font-medium text-slate-900';
-      entryText.textContent = g.entry;
+      const startButton = document.createElement('a');
+      startButton.href = '#/';
+      startButton.className = 'inline-flex items-center gap-2 px-6 py-3 rounded-2xl bg-purple-600 hover:bg-purple-700 text-white font-medium transition-all duration-200 btn-animate focus-ring';
+      startButton.textContent = '✨ Start Your Journey';
 
-      card.appendChild(emoji);
-      card.appendChild(date);
-      card.appendChild(entryText);
-      carousel.appendChild(card);
-    });
+      emptyState.appendChild(iconContainer);
+      emptyState.appendChild(heading);
+      emptyState.appendChild(description);
+      emptyState.appendChild(startButton);
 
-    section.appendChild(carousel);
+      section.appendChild(emptyState);
+    } else {
+      // Carousel with entries
+      const carousel = document.createElement('div');
+      carousel.className = 'flex gap-4 snap-x overflow-x-auto';
+
+      items.forEach((g, i) => {
+        const card = document.createElement('div');
+        card.id = 'g' + i;
+        card.className = 'min-w-[85%] snap-center rounded-2xl border border-slate-200 bg-white p-5 shadow-sm';
+
+        const emoji = document.createElement('div');
+        emoji.className = 'text-5xl mb-2';
+        emoji.textContent = g.mood ?? '✨';
+
+        const date = document.createElement('div');
+        date.className = 'text-sm opacity-60';
+        date.textContent = g.ymd;
+
+        const entryText = document.createElement('div');
+        entryText.className = 'text-lg font-medium text-slate-900';
+        entryText.textContent = g.entry;
+
+        card.appendChild(emoji);
+        card.appendChild(date);
+        card.appendChild(entryText);
+        carousel.appendChild(card);
+      });
+
+      section.appendChild(carousel);
+    }
+
     container.appendChild(section);
 
     setAutoplay(autoplay, true);
